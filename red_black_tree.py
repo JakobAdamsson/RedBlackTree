@@ -95,10 +95,12 @@ class RedBlackTree():
     def path(self, key, start_node=None):
         """Returns the path to given value in the tree, in a list"""
         path = []
+        # if startnode is None, set it to the root, else go into while loop
         if start_node is None:
             start_node = self.root
             path.append(start_node.value)
 
+        # loop untill we reach the end node, that being a nil node(none_node)
         while start_node != self.none_node:
             if key == start_node.value:
                 return path
@@ -112,24 +114,29 @@ class RedBlackTree():
 
     def bfs(self):
         """Searches the tree, breadth first"""
+        #start in the root
         root_node = self.root
-        lst = []
 
+        # append each visited node into this list
+        node_lst = []
+
+        # nodes gets appended to this list, then popped to check next child node
         node_queue = [root_node]
         while len(node_queue) > 0:
             if node_queue != []:
+                # grab first node in the queue, check its children
                 check_current_node = node_queue.pop(0)
             if check_current_node != self.none_node:
-                if check_current_node.value not in lst:
+                if check_current_node.value not in node_lst:
                     if check_current_node.left != self.none_node:
                         node_queue.append(check_current_node.left)
 
                     if check_current_node.right != self.none_node:
                         node_queue.append(check_current_node.right)
 
-                    lst.append([check_current_node.value, check_current_node.color,
-                                check_current_node.left.value, check_current_node.right.value])
-        return lst
+                    node_lst.append([check_current_node.value, check_current_node.color,
+                                     check_current_node.left.value, check_current_node.right.value])
+        return node_lst
 
     def search(self, key, node=None):
         """Searches for given value"""
@@ -142,6 +149,7 @@ class RedBlackTree():
         if node is self.none_node:
             return False
 
+        # search for given value by using recurssion
         if node is not None:
             if key < node.value:
                 return self.search(key, node.left)
@@ -152,6 +160,8 @@ class RedBlackTree():
         if root is None:
             root = self.root
         min_val = root
+        # loop until the the last node in the left subtree has been reached
+        # updating var min_val untill we reach it
         while min_val.left != self.none_node:
             min_val = min_val.left
         return min_val.value
@@ -161,6 +171,8 @@ class RedBlackTree():
         if root is None:
             root = self.root
         min_node = root
+        # loop until the the last node in the left subtree has been reached
+        # updating var min_node untill we reach it
         while min_node.left != self.none_node:
             min_node = min_node.left
         return min_node
@@ -170,6 +182,8 @@ class RedBlackTree():
         if root is None:
             root = self.root
         max_val = root
+        # loop until the the last node in the right subtree has been reached
+        # updating var max_val untill we reach it
         while max_val.right != self.none_node:
             max_val = max_val.right
         return max_val.value
@@ -177,9 +191,11 @@ class RedBlackTree():
     def left_rotate(self, node):
         """Rotates the tree so it keeps the red black tree constraints """
         node2 = node.right
+        # rotate node(parameter)'s left subtree into node2's right subtree
         node.right = node2.left
         if node2.left != self.none_node:
             node2.left.parent = node
+        # connect node(parameter)'s parent to node2'
         node2.parent = node.parent
         if node.parent == self.none_node:
             self.root = node2
@@ -187,7 +203,9 @@ class RedBlackTree():
             node.parent.left = node2
         else:
             node.parent.right = node2
+        # move node(parameter) to the left of node2, to maintain correct structure
         node2.left = node
+        # since rotated, node(parameter)'s parent needs new value
         node.parent = node2
 
     def right_rotate(self, node):
@@ -208,9 +226,12 @@ class RedBlackTree():
 
     def insert(self, new_val):
         """Inserts given value into the tree"""
-        if self.search(new_val):  # to handle dups
+        # if value already in tree, return
+        if self.search(new_val):
             return
+        # create new node, containing the wanted value to insert
         node = Node(new_val)
+        # y_node and x_node is helper nodes
         y_node = self.none_node
         x_node = self.root
         while x_node != self.none_node:
@@ -226,42 +247,47 @@ class RedBlackTree():
             y_node.left = node
         else:
             y_node.right = node
+        # to maintan corrent structure of the tree
         node.left = self.none_node
         node.right = self.none_node
         node.color = RED
+        # restore corrent properties of red black tree
         self.insert_fixup(node)
 
     def insert_fixup(self, node):
-        """After insert, it recolors the nodes if needed to keep the structure"""
+        """After insert, it recolors the nodes if needed to keep the structure
+        and corrent properties of e red black tree. Explenation of cases may
+        be seen in the README.md file in the github repository"""
         while node.parent.color == RED:
             if node.parent == node.parent.parent.left:
                 y_node = node.parent.parent.right
                 if y_node.color == RED:
-                    node.parent.color = BLACK
-                    y_node.color = BLACK
-                    node.parent.parent.color = RED
-                    node = node.parent.parent
+                    node.parent.color = BLACK  # case 1
+                    y_node.color = BLACK  # case 1
+                    node.parent.parent.color = RED  # case 1
+                    node = node.parent.parent  # case 1
                 else:
                     if node == node.parent.right:
-                        node = node.parent
-                        self.left_rotate(node)
-                    node.parent.color = BLACK
-                    node.parent.parent.color = RED
-                    self.right_rotate(node.parent.parent)
+                        node = node.parent  # case 2
+                        self.left_rotate(node)  # case 2
+                    node.parent.color = BLACK  # case 3
+                    node.parent.parent.color = RED  # case 3
+                    self.right_rotate(node.parent.parent)  # case 3
             else:
                 y_node = node.parent.parent.left
                 if y_node.color == RED:
-                    node.parent.color = BLACK
-                    y_node.color = BLACK
-                    node.parent.parent.color = RED
-                    node = node.parent.parent
+                    node.parent.color = BLACK  # case 1
+                    y_node.color = BLACK  # case 1
+                    node.parent.parent.color = RED  # case 1
+                    node = node.parent.parent  # case 1
                 else:
                     if node == node.parent.left:
-                        node = node.parent
-                        self.right_rotate(node)
-                    node.parent.color = BLACK
-                    node.parent.parent.color = RED
-                    self.left_rotate(node.parent.parent)
+                        node = node.parent  # case 2
+                        self.right_rotate(node)  # case 2
+                    node.parent.color = BLACK  # case 3
+                    node.parent.parent.color = RED  # case 3
+                    self.left_rotate(node.parent.parent)  # case 3
+        # root shall always be black, corrent if we colored the root red
         self.root.color = BLACK
 
     def rb_delete_fixup(self, node):
@@ -270,49 +296,49 @@ class RedBlackTree():
             if node == node.parent.left:
                 w_node = node.parent.right
                 if w_node.color == RED:
-                    w_node.color = BLACK
-                    node.parent.color = RED
-                    self.left_rotate(node.parent)
-                    w_node = node.parent.right
+                    w_node.color = BLACK  # case 1
+                    node.parent.color = RED  # case 1
+                    self.left_rotate(node.parent)  # case 1
+                    w_node = node.parent.right  # case 1
                 if w_node.left.color == BLACK and w_node.right.color == BLACK:
-                    w_node.color = RED
-                    node = node.parent
+                    w_node.color = RED  # case 2
+                    node = node.parent  # case 2
                 else:
                     if w_node.right.color == BLACK:
-                        w_node.left.color = BLACK
-                        w_node.color = RED
-                        self.right_rotate(w_node)
-                        w_node = node.parent.right
-                    w_node.color = node.parent.color
-                    node.parent.color = BLACK
-                    w_node.right.color = BLACK
-                    self.left_rotate(node.parent)
-                    node = self.root
+                        w_node.left.color = BLACK  # case 3
+                        w_node.color = RED  # case 3
+                        self.right_rotate(w_node)  # case 3
+                        w_node = node.parent.right  # case 3
+                    w_node.color = node.parent.color  # case 4
+                    node.parent.color = BLACK  # case 4
+                    w_node.right.color = BLACK  # case 4
+                    self.left_rotate(node.parent)  # case 4
+                    node = self.root  # case 4
             else:
                 w_node = node.parent.left
                 if w_node.color == RED:
-                    w_node.color = BLACK
-                    node.parent.color = RED
-                    self.right_rotate(node.parent)
-                    w_node = node.parent.left
+                    w_node.color = BLACK  # case 1
+                    node.parent.color = RED  # case 1
+                    self.right_rotate(node.parent)  # case 1
+                    w_node = node.parent.left  # case 1
                 if w_node.right.color == BLACK and w_node.left.color == BLACK:
-                    w_node.color = RED
-                    node = node.parent
+                    w_node.color = RED  # case 2
+                    node = node.parent  # case 2
                 else:
                     if w_node.left.color == BLACK:
-                        w_node.right.color = BLACK
-                        w_node.color = RED
-                        self.left_rotate(w_node)
-                        w_node = node.parent.left
-                    w_node.color = node.parent.color
-                    node.parent.color = BLACK
-                    w_node.left.color = BLACK
-                    self.right_rotate(node.parent)
-                    node = self.root
+                        w_node.right.color = BLACK  # case 3
+                        w_node.color = RED  # case 3
+                        self.left_rotate(w_node)  # case 3
+                        w_node = node.parent.left  # case 3
+                    w_node.color = node.parent.color  # case 4
+                    node.parent.color = BLACK  # case 4
+                    w_node.left.color = BLACK  # case 4
+                    self.right_rotate(node.parent)  # case 4
+                    node = self.root  # case 4
         node.color = BLACK
 
     def rb_transplant(self, node1, node2):
-        """Checks for each case"""
+        """Helper method to check each case during re-coloring phase"""
         if node1.parent == self.none_node:
             self.root = node2
         elif node1 == node1.parent.left:
@@ -323,8 +349,9 @@ class RedBlackTree():
 
     def get_node(self, value):
         """Returns a node of given value"""
+        # start in the root
         start_node = self.root
-
+        # loop untill node is found, then return it
         while start_node != self.none_node:
             if value == start_node.value:
                 return start_node
@@ -335,13 +362,17 @@ class RedBlackTree():
 
     def remove(self, value):
         """Removes a node from the tree"""
+        # check if value is even in the tree, if not do nothing
         if self.search(value):
             node = self.get_node(value)
+            # rep_node is a replacer node, it helps when removing certain nodes
             rep_node = node
             rep_node_original_color = rep_node.color
+            # check if node got a left subtree
             if node.left == self.none_node:
                 x_node = node.right
                 self.rb_transplant(node, node.right)
+            # check if node got a right subtree
             elif node.right == self.none_node:
                 x_node = node.left
                 self.rb_transplant(node, node.left)
@@ -364,11 +395,7 @@ class RedBlackTree():
 
 
 if __name__ == '__main__':
-    träd = RedBlackTree()
-    for i in [7]:
-        träd.insert(i)
-    # print(träd.bfs())
-    # print(träd.min(träd.root))
-    # print(träd.path(25))
-    träd.remove(7)
-    print(träd.bfs())
+    tree = RedBlackTree()
+    for i in [7, 6, 8, 0, 3, 1, 2, 3, 5, 7, 9, 944, 432, 7, 9, 0]:
+        tree.insert(i)
+    # put code below
