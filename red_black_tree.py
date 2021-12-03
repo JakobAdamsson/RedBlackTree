@@ -1,7 +1,8 @@
 """Red and black tree algorithm
-    Written by Jakob Adamsson"""
+    Written by Jakob Adamsson
+Explenations of the different cases may be seen inte course book"""
 
-#GLOBAL VARS
+# GLOBAL VARS
 BLACK = 'BLACK'
 RED = 'RED'
 
@@ -114,7 +115,7 @@ class RedBlackTree():
 
     def bfs(self):
         """Searches the tree, breadth first"""
-        #start in the root
+        # start in the root
         root_node = self.root
 
         # append each visited node into this list
@@ -256,8 +257,7 @@ class RedBlackTree():
 
     def insert_fixup(self, node):
         """After insert, it recolors the nodes if needed to keep the structure
-        and corrent properties of e red black tree. Explenation of cases may
-        be seen in the README.md file in the github repository"""
+        and corrent properties of e red black tree"""
         while node.parent.color == RED:
             if node.parent == node.parent.parent.left:
                 y_node = node.parent.parent.right
