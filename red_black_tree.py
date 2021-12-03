@@ -2,6 +2,9 @@
     Written by Jakob Adamsson
 Explenations of the different cases may be seen inte course book"""
 
+# IMPORTS
+import random
+
 # GLOBAL VARS
 BLACK = 'BLACK'
 RED = 'RED'
@@ -396,6 +399,6 @@ class RedBlackTree():
 
 if __name__ == '__main__':
     tree = RedBlackTree()
-    for i in [7, 6, 8, 0, 3, 1, 2, 3, 5, 7, 9, 944, 432, 7, 9, 0]:
+    for i in [random.randint(1, 100) for nbr in range(1, 20)]:
         tree.insert(i)
-    # put code below
+    # test code:
