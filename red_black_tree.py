@@ -1,6 +1,6 @@
 """Red and black tree algorithm
     Written by Jakob Adamsson
-Explenations of the different cases may be seen in the course book"""
+Explanations of the different cases may be seen in the course book"""
 
 # IMPORTS
 import random
